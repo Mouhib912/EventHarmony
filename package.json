@@ -1,0 +1,45 @@
+{
+  "name": "eventharmony",
+  "version": "1.0.0",
+  "description": "A comprehensive event management platform for B2B events, conferences, and exhibitions",
+  "main": "index.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "install-all": "npm install && npm run install-backend && npm run install-frontend",
+    "build": "cd frontend && npm run build",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run install-frontend && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/eventharmony.git"
+  },
+  "keywords": [
+    "event",
+    "management",
+    "b2b",
+    "conference",
+    "exhibition",
+    "mern",
+    "react",
+    "node",
+    "mongodb"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/eventharmony/issues"
+  },
+  "homepage": "https://github.com/yourusername/eventharmony#readme",
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
