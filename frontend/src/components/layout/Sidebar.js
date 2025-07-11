@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Box,
@@ -11,85 +11,99 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  Collapse,
   useTheme,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Event as EventIcon,
   People as PeopleIcon,
-  MeetingRoom as MeetingIcon,
+  Business as BusinessIcon,
+  Videocam as VideocamIcon,
   Settings as SettingsIcon,
   BarChart as AnalyticsIcon,
   Help as HelpIcon,
+  ExpandLess,
+  ExpandMore,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+
+const navigationConfig = (t) => [
+  {
+    text: t('dashboard.title'),
+    icon: <DashboardIcon />,
+    path: '/dashboard',
+    roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
+  },
+  {
+    text: t('events.title'),
+    icon: <EventIcon />,
+    path: '/events',
+    roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
+  },
+  {
+    text: t('meetings.title'),
+    icon: <BusinessIcon />,
+    subitems: [
+      {
+        text: t('meetings.b2b'),
+        icon: <BusinessIcon />,
+        path: '/meets',
+        roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
+      },
+      {
+        text: t('meetings.online'),
+        icon: <VideocamIcon />,
+        path: '/online-meetings',
+        roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
+      },
+    ],
+    roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
+  },
+  {
+    text: t('users.title'),
+    icon: <PeopleIcon />,
+    path: '/users',
+    roles: ['admin'],
+  },
+  {
+    text: t('analytics.title'),
+    icon: <AnalyticsIcon />,
+    path: '/analytics',
+    roles: ['admin', 'product_owner'],
+  },
+  {
+    text: t('settings.title'),
+    icon: <SettingsIcon />,
+    path: '/settings',
+    roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
+  },
+  {
+    text: t('help.title'),
+    icon: <HelpIcon />,
+    path: '/help',
+    roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
+  },
+];
 
 const Sidebar = ({ drawerWidth, mobileOpen, handleDrawerToggle }) => {
   const { user } = useAuth();
   const theme = useTheme();
   const location = useLocation();
   const { t } = useTranslation();
+  const [meetingsOpen, setMeetingsOpen] = useState(true);
 
-  // Define navigation items based on user role
-  const getNavigationItems = () => {
-    const items = [
-      {
-        text: t('dashboard.title'),
-        icon: <DashboardIcon />,
-        path: '/dashboard',
-        roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
-      },
-      {
-        text: t('events.title'),
-        icon: <EventIcon />,
-        path: '/events',
-        roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
-      },
-      {
-        text: t('meetings.title'),
-        icon: <MeetingIcon />,
-        path: '/meetings',
-        roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
-      },
-    ];
-
-    // Add admin/product owner specific items
-    if (user?.role === 'admin' || user?.role === 'product_owner') {
-      items.push(
-        {
-          text: t('users.title'),
-          icon: <PeopleIcon />,
-          path: '/users',
-          roles: ['admin', 'product_owner'],
-        },
-        {
-          text: t('events.statistics.title'),
-          icon: <AnalyticsIcon />,
-          path: '/analytics',
-          roles: ['admin', 'product_owner'],
-        },
-        {
-          text: t('common.settings'),
-          icon: <SettingsIcon />,
-          path: '/settings',
-          roles: ['admin', 'product_owner'],
-        },
-      );
-    }
-
-    // Add help item for all users
-    items.push({
-      text: t('common.help'),
-      icon: <HelpIcon />,
-      path: '/help',
-      roles: ['admin', 'product_owner', 'client', 'staff', 'participant'],
-    });
-
-    return items.filter(item => item.roles.includes(user?.role));
+  const handleMeetingsClick = () => {
+    setMeetingsOpen(!meetingsOpen);
   };
 
-  const navigationItems = getNavigationItems();
+  const getNavigationItems = () => {
+    const items = navigationConfig(t);
+    return items.filter((item) => 
+      !item.roles || (user && item.roles.includes(user.role)),
+    );
+  };
 
   const drawer = (
     <div>
@@ -114,32 +128,46 @@ const Sidebar = ({ drawerWidth, mobileOpen, handleDrawerToggle }) => {
       </Toolbar>
       <Divider />
       <List>
-        {navigationItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={item.path}
-              selected={location.pathname === item.path}
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: theme.palette.action.selected,
-                  borderRight: `3px solid ${theme.palette.primary.main}`,
-                  '&:hover': {
-                    backgroundColor: theme.palette.action.hover,
-                  },
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  color: location.pathname === item.path ? theme.palette.primary.main : 'inherit',
-                }}
+        {getNavigationItems().map((item) => (
+          item.subitems ? (
+            <React.Fragment key={item.text}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={handleMeetingsClick}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                  {meetingsOpen ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+              </ListItem>
+              <Collapse in={meetingsOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {item.subitems.map((subitem) => (
+                    <ListItem key={subitem.text} disablePadding>
+                      <ListItemButton
+                        component={Link}
+                        to={subitem.path}
+                        selected={location.pathname === subitem.path}
+                        sx={{ pl: 4 }}
+                      >
+                        <ListItemIcon>{subitem.icon}</ListItemIcon>
+                        <ListItemText primary={subitem.text} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Collapse>
+            </React.Fragment>
+          ) : (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={item.path}
+                selected={location.pathname === item.path}
               >
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          )
         ))}
       </List>
     </div>

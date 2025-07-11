@@ -25,11 +25,15 @@ app.use(morgan('dev'));
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const userRoutes = require('./routes/users');
+const b2bMeetingRoutes = require('./routes/b2bMeetings');
+const onlineMeetingRoutes = require('./routes/onlineMeetings');
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/b2b-meetings', b2bMeetingRoutes);
+app.use('/api/online-meetings', onlineMeetingRoutes);
 
 // Root route
 app.get('/', (req, res) => {

@@ -30,7 +30,7 @@ const NotFound = () => {
             variant="contained"
             color="primary"
           >
-            {t('common.backToDashboard')}
+            {t('errors.backToDashboard')}
           </Button>
         </Box>
       </Paper>

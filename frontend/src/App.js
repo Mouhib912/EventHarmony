@@ -29,7 +29,8 @@ const Profile = lazy(() => import('./pages/users/Profile'));
 const UsersList = lazy(() => import('./pages/users/UsersList'));
 
 // Meeting pages
-const Meetings = lazy(() => import('./pages/meetings/Meetings'));
+const B2BMeetings = lazy(() => import('./pages/meets/Meets'));
+const OnlineMeetings = lazy(() => import('./pages/meetings/OnlineMeetings'));
 
 // Error pages
 const NotFound = lazy(() => import('./pages/errors/NotFound'));
@@ -104,6 +105,10 @@ function App() {
             </ProtectedRoute>
           } />
           
+          {/* Meeting routes */}
+          <Route path="/meets" element={<B2BMeetings />} />
+          <Route path="/online-meetings" element={<OnlineMeetings />} />
+          
           {/* User routes */}
           <Route path="/profile" element={<Profile />} />
           <Route path="/users" element={
@@ -111,9 +116,6 @@ function App() {
               <UsersList />
             </ProtectedRoute>
           } />
-          
-          {/* Meeting routes */}
-          <Route path="/meetings" element={<Meetings />} />
         </Route>
         
         {/* 404 route */}

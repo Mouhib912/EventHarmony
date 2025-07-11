@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const { protect, restrictTo } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(protect);
@@ -12,7 +12,7 @@ router.patch('/profile', userController.updateProfile);
 router.patch('/profile/image', userController.updateProfileImage);
 
 // Admin and product owner routes
-router.use(restrictTo('admin', 'product_owner'));
+router.use(authorize('admin', 'product_owner'));
 router.get('/', userController.getAllUsers);
 router.post('/', userController.createUser);
 router.get('/:id', userController.getUser);
